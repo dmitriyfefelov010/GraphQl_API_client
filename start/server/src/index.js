@@ -19,10 +19,18 @@ const server = new ApolloServer({   context: async ({ req }) => {
     const user = users && users[0] || null;
 
     return { user: { ...user.dataValues } };
-  },typeDefs,resolvers,dataSources: () => ({
+  },typeDefs,
+  resolvers,
+  introspection: true,
+  playground: true,
+  dataSources: () => ({
     launchAPI: new LaunchAPI(),
     userAPI: new UserAPI({ store })
-  }) });
-server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+  }) 
 });
+if ( process.env.NODE_ENV !== 'test'){
+	server.listen({ port: process.env.PORT || 4000})
+	.then(({ url }) => {
+		console.log('app running at ${url}')
+	});
+}
