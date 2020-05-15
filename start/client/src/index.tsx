@@ -1,3 +1,4 @@
+import { resolvers, typeDefs } from './resolvers';
 import gql from 'graphql-tag';
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache, NormalizedCacheObject } from 'apollo-cache-inmemory';
@@ -14,10 +15,23 @@ const link = new HttpLink({
       authorization: localStorage.getItem('token'),
     }, 
 });
+const IS_LOGGED_IN = gql`
+  query IsUserLoggedIn {
+    isLoggedIn @client
+  }
+`;
 
 const client: ApolloClient<NormalizedCacheObject> = new ApolloClient({
   cache,
-  link
+  link,
+   typeDefs,
+  resolvers,
+});
+cache.writeData({
+  data: {
+    isLoggedIn: !!localStorage.getItem('token'),
+    cartItems: [],
+  },
 });
 client
   .query({
